@@ -8,7 +8,8 @@ import {
 
 type ResponseApi = {
 	ok: boolean;
-	message: string;
+	message?: string;
+	rol?: string;
 };
 
 const handler = async (
@@ -44,7 +45,7 @@ const handler = async (
 			return res.status(404).json({ ok: false, message: 'el rol no existe' });
 		}
 		const rolJSON: ModelRolT = rol.toJSON();
-		return res.status(200).json({ ok: true, message: rolJSON.nombre });
+		return res.status(200).json({ ok: true, rol: rolJSON.nombre });
 	} catch {
 		return res
 			.status(500)

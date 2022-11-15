@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { AiOutlineDelete, AiOutlineEdit } from 'react-icons/ai';
 import { Button, ModalForRemove, SubTitle } from '../../components';
 import { Table } from '../../components/Table';
@@ -6,6 +6,8 @@ import { UserI } from '../../components/Table/TableInterface';
 import { ContextUI } from '../../context/ContextUI';
 import { LayoutGeneral } from '../../layouts';
 import { PagePersonsForm } from '../../components';
+
+import jwt from "jsonwebtoken"
 
 const usersFake: UserI[] = [
 	{
@@ -170,12 +172,35 @@ const usersFake: UserI[] = [
 	},
 ];
 
-const heads = ['DNI', 'Nombres completo', 'Ciclo', 'Grupo', 'Codigo', 'Correo'];
+const heads = ['id', 'Nombre', 'Apellido paterno', 'Apellido Materno', 'DNI', 'Dirección', "Correo", "Número", "fecha_registro"];
+
+export interface PersonI {
+	id_persona: string;
+	nombre: string;
+	appaterno: string;
+	apmaterno: string;
+	dni: string;
+	direccion: string;
+	correo: string;
+	numero: string;
+	fecha_registro: Date;
+}
+
+
 
 const PagePersons = () => {
+	const [persons, setPersons] = useState<PersonI[]>()
+
 	const {
 		modal: { setIsOpenModal, setContentModal },
 	} = useContext(ContextUI);
+
+	useEffect(() => {
+		fetch(`api/v1/personas`, {
+		}).then((resRaw) => resRaw.json()).then((res: PersonI[]) => { setPersons(res) })
+	}, []
+	)
+
 
 	return (
 		<LayoutGeneral
@@ -183,7 +208,7 @@ const PagePersons = () => {
 			navbarHeight="h-1/12"
 			mainHeight="h-screen"
 		>
-			<div className="h-10/12">
+			{persons ? <div className="h-10/12">
 				<div className="flex flex-col items-center justify-center h-full">
 					<Button
 						background={'bg-primary'}
@@ -200,7 +225,7 @@ const PagePersons = () => {
 						}}
 					></Button>
 					<Table
-						data={usersFake}
+						data={persons}
 						heads={heads}
 						configs={{ numeration: true, align: 'text-center' }}
 						options={{
@@ -234,7 +259,7 @@ const PagePersons = () => {
 						}}
 					></Table>
 				</div>
-			</div>
+			</div> : <div className='h-10/12'>loading...</div>}
 		</LayoutGeneral>
 	);
 };
