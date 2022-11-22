@@ -16,7 +16,7 @@ ModelPersona.init(
     nombre: { type: DataTypes.CHAR(100) },
     appaterno: { type: DataTypes.CHAR(100) },
     apmaterno: { type: DataTypes.CHAR(100) },
-    dni: { type: DataTypes.NUMBER({ length: 10 }) },
+    dni: { type: DataTypes.NUMBER({ length: 10 }),unique:{name:"dni",msg:"el número de dni ya está en uso"} },
     direccion: { type: DataTypes.CHAR(200) },
     correo: {
       type: DataTypes.CHAR(200),
@@ -40,30 +40,30 @@ ModelPersona.init(
 );
 
 
-ModelPersona.hasMany(ModelPersona,{
-	foreignKey: 'id_persona',
-	sourceKey: 'id_persona'
-})
-ModelCargaPlan.belongsTo(ModelCargaPlan,{
-	foreignKey: 'id_persona',
-	targetKey: 'id_persona'
-})
+// ModelPersona.hasMany(ModelPersona,{
+// 	foreignKey: 'id_persona',
+// 	sourceKey: 'id_persona'
+// })
+// ModelCargaPlan.belongsTo(ModelCargaPlan,{
+// 	foreignKey: 'id_persona',
+// 	targetKey: 'id_persona'
+// })
 
-ModelPersona.hasMany(ModelPersona,{
-	foreignKey: 'id_persona',
-	sourceKey: 'id_persona'
-})
-ModelPersona_rol.belongsTo(ModelPersona_rol,{
-	foreignKey: 'id_persona',
-	targetKey: 'id_persona'
-})
+// ModelPersona.hasMany(ModelPersona,{
+// 	foreignKey: 'id_persona',
+// 	sourceKey: 'id_persona'
+// })
+// ModelPersona_rol.belongsTo(ModelPersona_rol,{
+// 	foreignKey: 'id_persona',
+// 	targetKey: 'id_persona'
+// })
 
 
-ModelPersona.hasMany(ModelPersona,{
-	foreignKey: 'id_persona',
-	sourceKey: 'id_persona'
-})
-ModelPlan_participante.belongsTo(ModelPlan_participante,{
-	foreignKey: 'id_persona',
-	targetKey: 'id_persona'
-})
+// ModelPersona.hasMany(ModelPersona,{
+// 	foreignKey: 'id_persona',
+// 	sourceKey: 'id_persona'
+// })
+// ModelPlan_participante.belongsTo(ModelPlan_participante,{
+// 	foreignKey: 'id_persona',
+// 	targetKey: 'id_persona'
+// })

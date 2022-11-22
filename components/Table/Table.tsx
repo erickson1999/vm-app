@@ -10,7 +10,7 @@ export const Table: FC<TableI> = ({
 }) => {
 	return (
 		<div
-			className={`overflow-auto max-h-3/4  w-4/5 lg:w-3/5 max-w-screen-${configs.maxWidth}  rounded-2xl shadow-md`}
+			className={`overflow-auto max-h-3/4  w-4/5 lg:w-4/5 max-w-screen-${configs.maxWidth}  rounded-2xl shadow-md`}
 		>
 			<table className={`${configs.align} border-2 w-full`}>
 				<TableHead

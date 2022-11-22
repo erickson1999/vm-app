@@ -15,11 +15,20 @@ export async function sign(
 		.sign(new TextEncoder().encode(secret));
 }
 
-export async function verify(token: string, secret: string): Promise<Object> {
+type JWTPayloadT = {
+	id: string;
+	iat: number;
+	exp: number;
+};
+
+export async function verify(
+	token: string,
+	secret: string
+): Promise<JWTPayloadT> {
 	const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
 	// run some checks on the returned payload, perhaps you expect some specific values
 
 	// if its all good, return it, or perhaps just return a boolean
-	return payload;
+	return payload as JWTPayloadT;
 }
 export const jwt = { sign, verify };

@@ -1,0 +1,1 @@
+1.- al crear un nuevo item(persona) y querer editarlo nos regresa un error

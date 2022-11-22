@@ -23,7 +23,6 @@ const handler = async (
 		'direccion',
 		'correo',
 		'numero',
-		'fecha_registro',
 		'usuario',
 		'password',
 	];

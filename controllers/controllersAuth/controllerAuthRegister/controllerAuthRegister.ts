@@ -42,43 +42,64 @@ export const controllerAuthRegister = async (
 		correo: body.correo,
 		direccion: body.correo,
 		dni: body.dni,
-		fecha_registro: body.fecha_registro,
+		fecha_registro: new Date(),
 		nombre: body.nombre,
 		numero: body.numero,
 	})
 		.then((newPerson: ModelPersona) => {
 			const newPersonJSON: ModelPersonaT = newPerson.toJSON();
+			const {
+				id_persona,
+				nombre,
+				appaterno,
+				apmaterno,
+				dni,
+				direccion,
+				correo,
+				numero,
+				fecha_registro,
+			} = newPersonJSON;
 			bcrypt.hash(body.password, bcryptConfig.rounds, (err, hash) => {
 				if (err) {
 					return res.json({ ok: false, message: messages.errorRegister });
 				}
-				
 				ModelUsuario.create({
 					id_persona: newPersonJSON.id_persona,
 					usuario: body.usuario,
 					password: hash,
 				})
 					.then(() => {
-						const token = jwt.sign(
-							{ id: newPersonJSON.id_persona },
-							jwtConfig.secret,
-							{
-								expiresIn: jwtConfig.expiresIn,
-							}
-						);
-						const serialized = serialize('x-access-token', token, {
-							httpOnly: true,
-							secure: process.env.NODE_ENV === 'production',
-							sameSite: 'lax',
-							maxAge: 86400,
-							path: '/',
-						});
-						res.setHeader('Set-Cookie', serialized);
-
+						// const token = jwt.sign(
+						// 	{ id: newPersonJSON.id_persona },
+						// 	jwtConfig.secret,
+						// 	{
+						// 		expiresIn: jwtConfig.expiresIn,
+						// 	}
+						// );
+						// const serialized = serialize('x-access-token', token, {
+						// 	httpOnly: true,
+						// 	secure: process.env.NODE_ENV === 'production',
+						// 	sameSite: 'lax',
+						// 	maxAge: 86400,
+						// 	path: '/',
+						// });
+						// res.setHeader('Set-Cookie', serialized);
 						return res.json({
 							ok: true,
 							message: messages.successRegister,
-							data: [newPersonJSON],
+							data: [
+								{
+									id_persona,
+									nombre,
+									appaterno,
+									apmaterno,
+									dni,
+									direccion,
+									correo,
+									numero,
+									fecha_registro,
+								},
+							],
 						});
 					})
 					.catch((err) => {
@@ -91,10 +112,9 @@ export const controllerAuthRegister = async (
 			});
 		})
 		.catch((err) => {
-			console.error(err);
 			return res.status(500).json({
 				ok: false,
-				message: messages.errorRegister,
+				message: err.message || messages.errorRegister,
 			});
 		});
 };

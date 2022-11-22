@@ -33,10 +33,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       }
     case "DELETE":
       try {
-        const id_persona_rol = [req.query.id];
+        const id_persona = [req.query.id];
         await ModelPersona_rol.destroy({
           where: {
-            id_persona_rol,
+            id_persona,
           },
         });
         return res.send(200);
