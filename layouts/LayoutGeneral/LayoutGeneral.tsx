@@ -1,45 +1,48 @@
 import { FC, useState } from 'react';
 import { LayoutGeneralI } from '.';
 import { Sidebar, SidebarItemI } from '../../components';
-import { LayoutGeneralFooter } from './components/LayoutGeneralFooter';
 import { LayoutGeneralNavbar } from './components/LayoutGeneralNavbar';
 
 //data example
 const itemsFake: SidebarItemI[] = [
 	{
-		name: 'Rol',
-		url: '/roles',
+		name: 'Asistencias',
+		url: '/asistencias',
 	},
 	{
-		name: 'Usuarios',
-		url: '/users',
+		name: 'Programas',
+		url: '/programas',
 	},
 	{
-		name: 'Periodo',
-		url: '/periods',
+		name: 'Proyectos',
+		url: '/proyectos',
 	},
 	{
 		name: 'Personas',
-		url: '/persons',
+		url: '/personas',
 	},
 	{
-		name: 'Eventos',
-		url: '/events',
+		name: 'Sucursales',
+		url: '/sucursales',
+	},
+	{
+		name: 'Facultades',
+		url: '/facultades',
+	},
+	{
+		name: 'Escuelas',
+		url: '/escuelas',
 	},
 ];
 
 export const LayoutGeneral: FC<LayoutGeneralI> = ({
 	children,
-	footerHeight = '',
-	footerWidth = '',
 	navbarHeight = '',
 	navbarWidth = '',
-	mainHeight = '',
-	mainWidth = '',
 }) => {
-	const [isOpenSidebar, setIsOpenSidebar] = useState(true);
+	const [isOpenSidebar, setIsOpenSidebar] = useState(false);
 	return (
-		<main className={`${mainHeight} ${mainWidth}`}>
+		<>
 			<Sidebar
 				isOpenSidebar={isOpenSidebar}
 				setIsOpenSidebar={setIsOpenSidebar}
@@ -52,10 +55,6 @@ export const LayoutGeneral: FC<LayoutGeneralI> = ({
 				setIsOpenSidebar={setIsOpenSidebar}
 			></LayoutGeneralNavbar>
 			{children}
-			<LayoutGeneralFooter
-				height={footerHeight}
-				width={footerWidth}
-			></LayoutGeneralFooter>
-		</main>
+		</>
 	);
 };

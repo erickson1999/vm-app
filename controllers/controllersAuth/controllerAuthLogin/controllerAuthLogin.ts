@@ -6,6 +6,9 @@ import { serialize } from 'cookie';
 import {
 	ModelPersona,
 	ModelPersonaT,
+	ModelPersona_rol,
+	ModelPersona_rolT,
+	ModelRol,
 	ModelUsuario,
 	ModelUsuarioT,
 } from '../../../models';
@@ -52,13 +55,23 @@ export const controllerAuthLogin = async (
 				message: 'el usuario o la contraseña es incorrecta',
 			});
 		}
-		const token = await sign(
-			{ id: userJSON.id_persona },
-			process.env.TOKEN_SECRET,
-			{
-				expiresIn: 86400,
-			}
-		);
+		//get rol
+		const personaRol = await ModelPersona_rol.findOne({
+			where: { id_persona: personJSON.id_persona },
+		});
+		if (!personaRol) {
+			return res
+				.status(404)
+				.json({ ok: false, message: 'la persona no tiene un rol' });
+		}
+		const personaRolJSON: ModelPersona_rolT = personaRol.toJSON();
+		const rol = await ModelRol.findByPk(personaRolJSON.id_rol);
+		if (!rol) {
+			return res.status(404).json({ ok: false, message: 'el rol no existe' });
+		}
+		const token = await sign({ user:personJSON, rol }, process.env.TOKEN_SECRET, {
+			expiresIn: 86400,
+		});
 		const serialized = serialize('x-access-token', token, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === 'production',
@@ -67,7 +80,7 @@ export const controllerAuthLogin = async (
 			path: '/',
 		});
 		res.setHeader('Set-Cookie', serialized);
-		res.json({
+		res.json({	
 			ok: true,
 			message: 'inicio de sesión éxitoso',
 			data: [personJSON],

@@ -2,8 +2,7 @@ export * from './Button';
 export * from './Modal';
 export * from './SubTitle';
 export * from './Title';
-export * from './Form';
+export * from './Forms';
 export * from './Sidebar';
-export * from './Table';
 export * from './ModalForRemove';
-export * from './Pages';
+export * from "./Table"

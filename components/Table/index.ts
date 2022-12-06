@@ -1,3 +1,1 @@
-export * from './Table';
-export * from './TableInterface';
-export * from './components';
+export * from "./Table"

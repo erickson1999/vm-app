@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { sequelize } from '../../../../db';
-import '../../../../models/categorias';
 type InitsResponseT =
 	| {
 			message: string;

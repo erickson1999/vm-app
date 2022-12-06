@@ -22,11 +22,11 @@ ModelCiclo.init(
   { sequelize, modelName: "ciclo", timestamps: false }
 );
 
-ModelCiclo.hasMany(ModelCiclo,{
+ModelCiclo.hasMany(ModelCargaPlan,{
 	foreignKey: 'id_ciclo',
 	sourceKey: 'id_ciclo'
 })
-ModelCargaPlan.belongsTo(ModelCargaPlan,{
+ModelCargaPlan.belongsTo(ModelCiclo,{
 	foreignKey: 'id_ciclo',
 	targetKey: 'id_ciclo'
 })

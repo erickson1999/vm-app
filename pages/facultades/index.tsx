@@ -1,78 +1,63 @@
-import { useContext, useEffect, useState } from 'react';
-import { AiOutlineDelete, AiOutlineEdit } from 'react-icons/ai';
-import { Button, ModalForRemove, SubTitle } from '../../components';
-import { Table } from '../../components/Table';
-import { UserI } from '../../components/Table/TableInterface';
-import { ContextUI } from '../../context/ContextUI';
-import { LayoutGeneral } from '../../layouts';
-import { PageGruposForm } from '../../components/Pages/PageGrupo_last';
+import { useEffect, useState } from 'react';
+
 import axios from "axios"
-import { ModelFacultadT, ModelPersonaT } from '../../models';
-import { PageFacultadesForm } from '../../components/Pages/PageFacultades';
 
-const heads = ['id', 'Estado', 'Nombre', "alias"];
+import { FormFacultades, Table } from '../../components';
+import { LayoutGeneral } from '../../layouts';
+import { ModelFacultadT } from '../../models';
+import { TableGridColumnsI } from '../../components/Table/TableInterfaces';
 
-export interface CicloI {
-	id_grupo: string;
-	nombre: string;
-	estado: string;
-	alias: string
-}
-
-
+const columns: TableGridColumnsI[] = [{ name: "nombre", label: "Nombre Facultad", options: { filter: true, sort: true } },
+{ name: "estado", label: "Estado Facultad", options: { filter: true, sort: true } },
+{ name: "alias", label: "Alias Facultad", options: { filter: true, sort: true } }]
 
 const PageFacultades = () => {
 	const [facultades, setFacultades] = useState<ModelFacultadT[]>()
-
-	const {
-		modal: { setIsOpenModal, setContentModal },
-	} = useContext(ContextUI);
-
 	useEffect(() => {
-		axios.get(`api/v1/facultades`).then((res) => {
+		axios.get(`/api/v1/facultades`).then((res) => {
 			setFacultades(res.data)
 		}).catch((err) => { })
 	}, []
 	)
 
-	const removeItem = (idItem: number) => {
+	const removeItem = (item: ModelFacultadT, setIsOpenModal: React.Dispatch<React.SetStateAction<boolean>>) => {
+		const idItem = item.id_facultad
 		if (!facultades) return
 		const newFacultades = facultades.filter((facultad) => {
 			return facultad.id_facultad !== idItem
 		})
-		axios.delete(`api/v1/facultades/${idItem}`)
+		axios.delete(`/api/v1/facultades/${idItem}`)
 			.then((res) => {
-				setIsOpenModal(false)
 				setFacultades(newFacultades)
+				setIsOpenModal(false)
 			})
 			.catch((err) => { console.log({ err }) })
 
 	}
-	const updateItem = (item: ModelFacultadT) => {
+	const updateItem = (item: ModelFacultadT, setIsOpenModal: React.Dispatch<React.SetStateAction<boolean>>) => {
 		if (!facultades) return
 		const newfacultades = facultades.map((facultad) => {
 			if (facultad.id_facultad !== item.id_facultad) {
 				return facultad
 			}
 			return item
-
 		})
-		axios.put(`api/v1/facultades/${item.id_facultad}`, item)
+		axios.put(`/api/v1/facultades/${item.id_facultad}`, item)
 			.then((res) => {
-				setIsOpenModal(false)
 				setFacultades(newfacultades)
+				setIsOpenModal(false)
 			})
 			.catch((err) => {
 				console.log(err)
 			})
 	}
-	const createItem = (item: ModelFacultadT) => {
+	const createItem = (item: ModelFacultadT, setIsOpenModal: React.Dispatch<React.SetStateAction<boolean>>) => {
 		if (!facultades) return
-		axios.post(`api/v1/facultades`, item)
+		axios.post(`//api/v1/facultades`, item)
 			.then((res) => {
 				console.log({ res })
-				setIsOpenModal(false)
 				setFacultades([res.data, ...facultades])
+				setIsOpenModal(false)
 			})
 			.catch((err) => {
 				console.log(err)
@@ -85,55 +70,14 @@ const PageFacultades = () => {
 			mainHeight="h-screen"
 		>
 			{facultades ? <div className="h-10/12">
-				<div className="flex flex-col items-center justify-center h-full">
-					<Button
-						background={'bg-primary'}
-						text={'Nuevo ciclo +'}
-						padding={'px-4 py-2'}
-						rounded={'rounded-full'}
-						colorText={'text-white'}
-						className={
-							'font-bold my-1 border hover:border-primary hover:bg-white transition-all hover:text-primary ease-in'
-						}
-						onClick={() => {
-							setContentModal(<PageFacultadesForm createItem={createItem} />);
-							setIsOpenModal(true);
-						}}
-					></Button>
+				<div className="flex flex-col items-center justify-start h-full">
 					<Table
 						data={facultades}
-						heads={heads}
-						configs={{ numeration: true, align: 'text-center' }}
-						options={{
-							enabled: true,
-							actions: (item: ModelFacultadT) => {
-								return (
-									<>
-										<AiOutlineEdit
-											className="text-orange-500 cursor-pointer"
-											onClick={() => {
-												setContentModal(
-													<PageFacultadesForm itemData={item} updateItem={updateItem} />
-												);
-												setIsOpenModal(true);
-											}}
-										></AiOutlineEdit>
-										<AiOutlineDelete
-											className="text-red-500 cursor-pointer"
-											onClick={() => {
-												setContentModal(
-													<ModalForRemove deleteItem={() => { removeItem(item.id_facultad!) }} >
-														<SubTitle className='font-semibold text-black'>{`Eliminar a: este item`}</SubTitle>
-													</ModalForRemove>
-												);
-												setIsOpenModal(true);
-											}}
-										></AiOutlineDelete>
-									</>
-								);
-							},
-						}}
-					></Table>
+						columns={columns}
+						Form={FormFacultades}
+						createItem={createItem}
+						updateItem={updateItem}
+						deleteItem={removeItem}></Table>
 				</div>
 			</div> : <div className='h-10/12'>loading...</div>}
 		</LayoutGeneral>

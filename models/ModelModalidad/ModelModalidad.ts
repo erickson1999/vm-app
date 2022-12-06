@@ -19,11 +19,11 @@ ModelModalidad.init(
 	{ sequelize, modelName: 'modalidad', timestamps:false }
 );
 
-ModelModalidad.hasMany(ModelModalidad,{
+ModelModalidad.hasMany(ModelCargaPlan,{
 	foreignKey: 'id_modalidad',
 	sourceKey: 'id_modalidad'
 })
-ModelCargaPlan.belongsTo(ModelCargaPlan,{
+ModelCargaPlan.belongsTo(ModelModalidad,{
 	foreignKey: 'id_modalidad',
 	targetKey: 'id_modalidad'
 })

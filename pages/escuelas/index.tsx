@@ -1,76 +1,63 @@
-import { useContext, useEffect, useState } from 'react';
-import { AiOutlineDelete, AiOutlineEdit } from 'react-icons/ai';
-import { Button, ModalForRemove, SubTitle } from '../../components';
-import { Table } from '../../components/Table';
-import { UserI } from '../../components/Table/TableInterface';
-import { ContextUI } from '../../context/ContextUI';
-import { LayoutGeneral } from '../../layouts';
-import { PageGruposForm } from '../../components/Pages/PageGrupo_last';
+import { useEffect, useState } from 'react';
+
 import axios from "axios"
-import { ModelEscuelaT, ModelFacultadT, ModelPersonaT } from '../../models';
-import { PageEscuelasForm } from '../../components/Pages/PageEscuelas';
 
-const heads = ['id', 'Nombre', 'estado', "facultad"];
+import { FormEscuelas, Table } from '../../components';
+import { LayoutGeneral } from '../../layouts';
+import { ModelEscuelaT } from '../../models';
+import { TableGridColumnsI } from '../../components/Table/TableInterfaces';
 
-export interface CicloI {
-	id_grupo: string;
-	nombre: string;
-	estado: string;
-	alias: string
-}
-
-
+const columns: TableGridColumnsI[] = [{ name: "nombre", label: "Nombre escuelas", options: { filter: true, sort: true } },
+{ name: "estado", label: "Estado escuelas", options: { filter: true, sort: true } }]
 
 const PageEscuelas = () => {
 	const [escuelas, setEscuelas] = useState<ModelEscuelaT[]>()
-	const {
-		modal: { setIsOpenModal, setContentModal },
-	} = useContext(ContextUI);
-
 	useEffect(() => {
-		axios.get(`api/v1/escuelas`).then((res) => {
+		axios.get(`/api/v1/escuelas`).then((res) => {
 			setEscuelas(res.data)
-		}).catch((err) => { console.log({ err }) })
+		}).catch((err) => { })
 	}, []
 	)
-	const removeItem = (idItem: number) => {
+
+	const removeItem = (item: ModelEscuelaT, setIsOpenModal: React.Dispatch<React.SetStateAction<boolean>>) => {
+		const idItem = item.id_escuela
 		if (!escuelas) return
-		const newescuelas = escuelas.filter((facultad) => {
-			return facultad.id_facultad !== idItem
+		const newescuelas = escuelas.filter((escuelas) => {
+			return escuelas.id_escuela !== idItem
 		})
-		axios.delete(`api/v1/escuelas/${idItem}`)
+		axios.delete(`/api/v1/escuelas/${idItem}`)
 			.then((res) => {
-				setIsOpenModal(false)
 				setEscuelas(newescuelas)
+				setIsOpenModal(false)
 			})
 			.catch((err) => { console.log({ err }) })
 
 	}
-	const updateItem = (item: ModelEscuelaT) => {
+	const updateItem = (item: ModelEscuelaT, setIsOpenModal: React.Dispatch<React.SetStateAction<boolean>>) => {
 		console.log({ item })
 		if (!escuelas) return
-		const newEscuelas = escuelas.map((facultad) => {
-			if (facultad.id_facultad !== item.id_facultad) {
-				return facultad
+		const newescuelas = escuelas.map((escuelas) => {
+			if (escuelas.id_escuela !== item.id_escuela) {
+				return escuelas
 			}
 			return item
-
 		})
-		axios.put(`api/v1/escuelas/${item.id_escuela}`, item)
+		axios.put(`/api/v1/escuelas/${item.id_escuela}`, item)
 			.then((res) => {
+				setEscuelas(newescuelas)
 				setIsOpenModal(false)
-				setEscuelas(newEscuelas)
 			})
 			.catch((err) => {
 				console.log(err)
 			})
 	}
-	const createItem = (item: ModelFacultadT) => {
+	const createItem = (item: ModelEscuelaT, setIsOpenModal: React.Dispatch<React.SetStateAction<boolean>>) => {
 		if (!escuelas) return
-		axios.post(`api/v1/escuelas`, item)
+		axios.post(`/api/v1/escuelas`, item)
 			.then((res) => {
-				setIsOpenModal(false)
+				console.log({ res })
 				setEscuelas([res.data, ...escuelas])
+				setIsOpenModal(false)
 			})
 			.catch((err) => {
 				console.log(err)
@@ -83,55 +70,14 @@ const PageEscuelas = () => {
 			mainHeight="h-screen"
 		>
 			{escuelas ? <div className="h-10/12">
-				<div className="flex flex-col items-center justify-center h-full">
-					<Button
-						background={'bg-primary'}
-						text={'Nuevo ciclo +'}
-						padding={'px-4 py-2'}
-						rounded={'rounded-full'}
-						colorText={'text-white'}
-						className={
-							'font-bold my-1 border hover:border-primary hover:bg-white transition-all hover:text-primary ease-in'
-						}
-						onClick={() => {
-							setContentModal(<PageEscuelasForm createItem={createItem} />);
-							setIsOpenModal(true);
-						}}
-					></Button>
+				<div className="flex flex-col items-center justify-start h-full">
 					<Table
 						data={escuelas}
-						heads={heads}
-						configs={{ numeration: true, align: 'text-center' }}
-						options={{
-							enabled: true,
-							actions: (item: ModelFacultadT) => {
-								return (
-									<>
-										<AiOutlineEdit
-											className="text-orange-500 cursor-pointer"
-											onClick={() => {
-												setContentModal(
-													<PageEscuelasForm itemData={item} updateItem={updateItem} />
-												);
-												setIsOpenModal(true);
-											}}
-										></AiOutlineEdit>
-										<AiOutlineDelete
-											className="text-red-500 cursor-pointer"
-											onClick={() => {
-												setContentModal(
-													<ModalForRemove deleteItem={() => { removeItem(item.id_facultad!) }} >
-														<SubTitle className='font-semibold text-black'>{`Eliminar a: este item`}</SubTitle>
-													</ModalForRemove>
-												);
-												setIsOpenModal(true);
-											}}
-										></AiOutlineDelete>
-									</>
-								);
-							},
-						}}
-					></Table>
+						columns={columns}
+						Form={FormEscuelas}
+						createItem={createItem}
+						updateItem={updateItem}
+						deleteItem={removeItem}></Table>
 				</div>
 			</div> : <div className='h-10/12'>loading...</div>}
 		</LayoutGeneral>

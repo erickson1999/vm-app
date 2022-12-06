@@ -1,7 +1,7 @@
 import { sequelize } from '../../db';
 import { Model, DataTypes } from 'sequelize';
 import { ModelPeriodoT } from '.';
-import { ModelCargaPlan } from '../ModelCargaPlan'
+import { ModelCargaPlan } from '../ModelCargaPlan';
 export class ModelPeriodo extends Model<any, ModelPeriodoT> {}
 
 ModelPeriodo.init(
@@ -12,17 +12,17 @@ ModelPeriodo.init(
 			autoIncrement: true,
 			allowNull: false,
 		},
-		nombre: { type: DataTypes.INTEGER},
-	    estado: { type: DataTypes.CHAR },
+		nombre: { type: DataTypes.INTEGER },
+		estado: { type: DataTypes.CHAR },
 	},
-	{ sequelize, modelName: 'periodo', timestamps:false }
+	{ sequelize, modelName: 'periodo', timestamps: false }
 );
 
-ModelPeriodo.hasMany(ModelPeriodo,{
+ModelPeriodo.hasMany(ModelCargaPlan, {
 	foreignKey: 'id_periodo',
-	sourceKey: 'id_periodo'
-})
-ModelCargaPlan.belongsTo(ModelCargaPlan,{
+	sourceKey: 'id_periodo',
+});
+ModelCargaPlan.belongsTo(ModelPeriodo, {
 	foreignKey: 'id_periodo',
-	targetKey: 'id_periodo'
-})
+	targetKey: 'id_periodo',
+});

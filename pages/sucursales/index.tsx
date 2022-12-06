@@ -1,38 +1,75 @@
-import { useContext, useEffect, useState } from 'react';
-import { AiOutlineDelete, AiOutlineEdit } from 'react-icons/ai';
-import { Button, ModalForRemove, SubTitle } from '../../components';
-import { Table } from '../../components/Table';
-import { UserI } from '../../components/Table/TableInterface';
-import { ContextUI } from '../../context/ContextUI';
+import { useEffect, useState } from 'react';
+
+import axios from "axios"
+
+import { FormSucursales, Table } from '../../components';
 import { LayoutGeneral } from '../../layouts';
-import { PagePersonsForm } from '../../components';
-import { PageCiclosForm } from '../../components/Pages/PageCiclos';
-import { PageSucursalesForm } from '../../components/Pages/PageSucursales';
+import { ModelSucursalT } from '../../models';
+import { TableGridColumnsI } from '../../components/Table/TableInterfaces';
+import { useRouter } from 'next/router';
 
-
-const heads = ['id', 'Nombre', "alias"];
-
-export interface CicloI {
-	id_ciclo: string;
-	nombre: string;
-	alias: string
-}
-
-
+const columns: TableGridColumnsI[] = [{ name: "nombre", label: "Nombre sucursal", options: { filter: true, sort: true } },
+{ name: "estado", label: "Estado sucursal", options: { filter: true, sort: true } },
+]
 
 const PageSucursales = () => {
-	const [persons, setPersons] = useState<CicloI[]>()
+	const [sucursales, setSucursales] = useState<ModelSucursalT[]>()
+	const router = useRouter()
 
-	const {
-		modal: { setIsOpenModal, setContentModal },
-	} = useContext(ContextUI);
 
 	useEffect(() => {
-		fetch(`api/v1/sucursales`, {
-		}).then((resRaw) => resRaw.json()).then((res: CicloI[]) => { setPersons(res) })
+		axios.get(`/api/v1/sucursales`).then((res) => {
+			setSucursales(res.data)
+		}).catch((err) => { })
 	}, []
 	)
 
+	const removeItem = (item: ModelSucursalT, setIsOpenModal: React.Dispatch<React.SetStateAction<boolean>>) => {
+		const idItem = item.id_sucursal
+		if (!sucursales) return
+		const newsucursales = sucursales.filter((sucursales) => {
+			return sucursales.id_sucursal !== idItem
+		})
+		axios.delete(`/api/v1/sucursales/${idItem}`)
+			.then((res) => {
+				setSucursales(newsucursales)
+				setIsOpenModal(false)
+			})
+			.catch((err) => { console.log({ err }) })
+
+	}
+	const updateItem = (item: ModelSucursalT, setIsOpenModal: React.Dispatch<React.SetStateAction<boolean>>) => {
+		if (!sucursales) return
+		const newsucursales = sucursales.map((sucursales) => {
+			if (sucursales.id_sucursal !== item.id_sucursal) {
+				return sucursales
+			}
+			return item
+		})
+		axios.put(`/api/v1/sucursales/${item.id_sucursal}`, item)
+			.then((res) => {
+				setSucursales(newsucursales)
+				setIsOpenModal(false)
+			})
+			.catch((err) => {
+				console.log(err)
+			})
+	}
+	const createItem = (item: ModelSucursalT, setIsOpenModal: React.Dispatch<React.SetStateAction<boolean>>) => {
+		if (!sucursales) return
+		axios.post(`/api/v1/sucursales`, item)
+			.then((res) => {
+				console.log({ res })
+				setSucursales([res.data, ...sucursales])
+				setIsOpenModal(false)
+			})
+			.catch((err) => {
+				console.log(err)
+			})
+	}
+	// const viewDetails = (item: ModelSucursalT) => {
+	// 	router.push(`sucursales/${item.id_sucursal}`)
+	// }
 
 	return (
 		<LayoutGeneral
@@ -40,56 +77,16 @@ const PageSucursales = () => {
 			navbarHeight="h-1/12"
 			mainHeight="h-screen"
 		>
-			{persons ? <div className="h-10/12">
-				<div className="flex flex-col items-center justify-center h-full">
-					<Button
-						background={'bg-primary'}
-						text={'Nuevo ciclo +'}
-						padding={'px-4 py-2'}
-						rounded={'rounded-full'}
-						colorText={'text-white'}
-						className={
-							'font-bold my-1 border hover:border-primary hover:bg-white transition-all hover:text-primary ease-in'
-						}
-						onClick={() => {
-							setContentModal(<PageSucursalesForm />);
-							setIsOpenModal(true);
-						}}
-					></Button>
+			{sucursales ? <div className="h-10/12">
+				<div className="flex flex-col items-center justify-start h-full">
 					<Table
-						data={persons}
-						heads={heads}
-						configs={{ numeration: true, align: 'text-center' }}
-						options={{
-							enabled: true,
-							actions: (item: UserI) => {
-								return (
-									<>
-										<AiOutlineEdit
-											className="text-orange-500 cursor-pointer"
-											onClick={() => {
-												setContentModal(
-													<PageSucursalesForm itemData={item} />
-												);
-												setIsOpenModal(true);
-											}}
-										></AiOutlineEdit>
-										<AiOutlineDelete
-											className="text-red-500 cursor-pointer"
-											onClick={() => {
-												setContentModal(
-													<ModalForRemove deleteItem={() => { setIsOpenModal(false) }} >
-														<SubTitle className='font-semibold text-black'>{`Eliminar a: este item`}</SubTitle>
-													</ModalForRemove>
-												);
-												setIsOpenModal(true);
-											}}
-										></AiOutlineDelete>
-									</>
-								);
-							},
-						}}
-					></Table>
+						data={sucursales}
+						columns={columns}
+						Form={FormSucursales}
+						createItem={createItem}
+						updateItem={updateItem}
+						deleteItem={removeItem} ></Table>
+
 				</div>
 			</div> : <div className='h-10/12'>loading...</div>}
 		</LayoutGeneral>

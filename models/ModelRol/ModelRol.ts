@@ -18,12 +18,12 @@ ModelRol.init(
 	},
 	{ sequelize, modelName: 'rol', timestamps:false }
 );
-ModelRol.hasMany(ModelRol, {
-	foreignKey: "id_rol",
-	sourceKey: "id_rol",
-  });
-  ModelPersona_rol.belongsTo(ModelPersona_rol, {
-	foreignKey: "id_rol",
-	targetKey: "id_rol",
-  });
+// ModelRol.hasMany(ModelRol, {
+// 	foreignKey: "id_rol",
+// 	sourceKey: "id_rol",
+//   });
+//   ModelPersona_rol.belongsTo(ModelPersona_rol, {
+// 	foreignKey: "id_rol",
+// 	targetKey: "id_rol",
+//   });
   

@@ -13,19 +13,18 @@ ModelGrupo.init(
 			autoIncrement: true,
 			allowNull: false,
 		},
-		nombre: { type: DataTypes.CHAR(50)},
-	    estado: { type: DataTypes.CHAR (20)},
-	    alias: { type: DataTypes.CHAR(10) },
+		nombre: { type: DataTypes.CHAR(50) },
+		estado: { type: DataTypes.CHAR(20) },
+		alias: { type: DataTypes.CHAR(10) },
 	},
-	{ sequelize, modelName: 'grupo', timestamps:false }
+	{ sequelize, modelName: 'grupo', timestamps: false }
 );
 
-ModelGrupo.hasMany(ModelGrupo,{
+ModelGrupo.hasMany(ModelCargaPlan, {
 	foreignKey: 'id_grupo',
-	sourceKey: 'id_grupo'
-})
-ModelCargaPlan.belongsTo(ModelCargaPlan,{
+	sourceKey: 'id_grupo',
+});
+ModelCargaPlan.belongsTo(ModelGrupo, {
 	foreignKey: 'id_grupo',
-	targetKey: 'id_grupo'
-})
-
+	targetKey: 'id_grupo',
+});

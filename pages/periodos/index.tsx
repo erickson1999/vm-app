@@ -1,93 +1,84 @@
-import { useContext, useEffect, useState } from 'react';
-import { AiOutlineDelete, AiOutlineEdit } from 'react-icons/ai';
-import { Button, ModalForRemove, SubTitle } from '../../components';
-import { Table } from '../../components/Table';
-import { UserI } from '../../components/Table/TableInterface';
-import { ContextUI } from '../../context/ContextUI';
+import { useEffect, useState } from 'react';
+
+import axios from "axios"
+
+import { FormPeriodos, Table } from '../../components';
 import { LayoutGeneral } from '../../layouts';
-import { PageModalidadesForm } from '../../components/Pages/PageModalidades';
+import { ModelPeriodoT } from '../../models';
+import { TableGridColumnsI } from '../../components/Table/TableInterfaces';
 
-
-const heads = ['id', 'Nombre', "Estado"];
-
-export interface CicloI {
-	id_modalidad: string;
-	nombre: string;
-	estado: string;
-}
-
-
+const columns: TableGridColumnsI[] = [{ name: "nombre", label: "Nombre periodos", options: { filter: true, sort: true } },
+{ name: "estado", label: "Estado periodos", options: { filter: true, sort: true } },
+]
 
 const PagePeriodos = () => {
-	const [persons, setPersons] = useState<CicloI[]>()
-
-	const {
-		modal: { setIsOpenModal, setContentModal },
-	} = useContext(ContextUI);
-
+	const [periodos, setperiodos] = useState<ModelPeriodoT[]>()
 	useEffect(() => {
-		fetch(`api/v1/periodos`, {
-		}).then((resRaw) => resRaw.json()).then((res: CicloI[]) => { setPersons(res) })
+		axios.get(`api/v1/periodos`).then((res) => {
+			setperiodos(res.data)
+		}).catch((err) => { })
 	}, []
 	)
 
+	const removeItem = (item: ModelPeriodoT, setIsOpenModal: React.Dispatch<React.SetStateAction<boolean>>) => {
+		const idItem = item.id_periodo
+		if (!periodos) return
+		const newperiodos = periodos.filter((periodos) => {
+			return periodos.id_periodo !== idItem
+		})
+		axios.delete(`api/v1/periodos/${idItem}`)
+			.then((res) => {
+				setperiodos(newperiodos)
+				setIsOpenModal(false)
+			})
+			.catch((err) => { console.log({ err }) })
 
+	}
+	const updateItem = (item: ModelPeriodoT, setIsOpenModal: React.Dispatch<React.SetStateAction<boolean>>) => {
+		if (!periodos) return
+		const newperiodos = periodos.map((periodos) => {
+			if (periodos.id_periodo !== item.id_periodo) {
+				return periodos
+			}
+			return item
+		})
+		axios.put(`api/v1/periodos/${item.id_periodo}`, item)
+			.then((res) => {
+				console.log({ updatePeriodo: res })
+				setperiodos(newperiodos)
+				setIsOpenModal(false)
+			})
+			.catch((err) => {
+				console.log(err)
+			})
+	}
+	const createItem = (item: ModelPeriodoT, setIsOpenModal: React.Dispatch<React.SetStateAction<boolean>>) => {
+		if (!periodos) return
+		axios.post(`api/v1/periodos`, item)
+			.then((res) => {
+				console.log({ res })
+				setperiodos([res.data, ...periodos])
+				setIsOpenModal(false)
+			})
+			.catch((err) => {
+				console.log(err)
+			})
+	}
 	return (
 		<LayoutGeneral
 			footerHeight="h-1/12"
 			navbarHeight="h-1/12"
 			mainHeight="h-screen"
 		>
-			{persons ? <div className="h-10/12">
-				<div className="flex flex-col items-center justify-center h-full">
-					<Button
-						background={'bg-primary'}
-						text={'Nuevo ciclo +'}
-						padding={'px-4 py-2'}
-						rounded={'rounded-full'}
-						colorText={'text-white'}
-						className={
-							'font-bold my-1 border hover:border-primary hover:bg-white transition-all hover:text-primary ease-in'
-						}
-						onClick={() => {
-							setContentModal(<PageModalidadesForm />);
-							setIsOpenModal(true);
-						}}
-					></Button>
+			{periodos ? <div className="h-10/12">
+				<div className="flex flex-col items-center justify-start h-full">
 					<Table
-						data={persons}
-						heads={heads}
-						configs={{ numeration: true, align: 'text-center' }}
-						options={{
-							enabled: true,
-							actions: (item: UserI) => {
-								return (
-									<>
-										<AiOutlineEdit
-											className="text-orange-500 cursor-pointer"
-											onClick={() => {
-												setContentModal(
-													<PageModalidadesForm itemData={item} />
-												);
-												setIsOpenModal(true);
-											}}
-										></AiOutlineEdit>
-										<AiOutlineDelete
-											className="text-red-500 cursor-pointer"
-											onClick={() => {
-												setContentModal(
-													<ModalForRemove deleteItem={() => { setIsOpenModal(false) }} >
-														<SubTitle className='font-semibold text-black'>{`Eliminar a: este item`}</SubTitle>
-													</ModalForRemove>
-												);
-												setIsOpenModal(true);
-											}}
-										></AiOutlineDelete>
-									</>
-								);
-							},
-						}}
-					></Table>
+						data={periodos}
+						columns={columns}
+						Form={FormPeriodos}
+						createItem={createItem}
+						updateItem={updateItem}
+						deleteItem={removeItem}></Table>
 				</div>
 			</div> : <div className='h-10/12'>loading...</div>}
 		</LayoutGeneral>

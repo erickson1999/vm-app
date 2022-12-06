@@ -1,8 +1,11 @@
 import { SignJWT, jwtVerify } from 'jose';
+import { ModelPersonaT, ModelRolT } from '../models';
+
+const SECRET = process.env.TOKEN_SECRET;
 
 export async function sign(
 	payload: Object,
-	secret: string,
+	secret = SECRET,
 	config = { expiresIn: 86400 }
 ): Promise<string> {
 	const iat = Math.floor(Date.now() / 1000);
@@ -16,14 +19,15 @@ export async function sign(
 }
 
 type JWTPayloadT = {
-	id: string;
+	user: ModelPersonaT;
+	rol: ModelRolT;
 	iat: number;
 	exp: number;
 };
 
 export async function verify(
 	token: string,
-	secret: string
+	secret = SECRET
 ): Promise<JWTPayloadT> {
 	const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
 	// run some checks on the returned payload, perhaps you expect some specific values

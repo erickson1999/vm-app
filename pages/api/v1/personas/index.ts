@@ -1,5 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { ModelPersona } from '../../../../models';
+import {
+	ModelDocente,
+	ModelParticipante,
+	ModelPersona,
+	ModelPersonaT,
+} from '../../../../models';
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -11,6 +16,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 				const personas = await ModelPersona.findAll();
 				return res.status(200).json(personas);
 			} catch (error) {
+				console.log(error);
 				return res.status(500).json({ message: error });
 			}
 		case 'POST':
@@ -24,9 +30,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 					direccion,
 					correo,
 					numero,
+					rol,
 				} = req.body;
-
-				const newPersonas = await ModelPersona.create({
+				await ModelPersona.create({
 					id_persona,
 					nombre,
 					appaterno,
@@ -36,8 +42,26 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 					correo,
 					numero,
 					fecha_registro: new Date(),
+					rol,
+				}).then((newPersona) => {
+					const newPersonaJSON: ModelPersonaT = newPersona.toJSON();
+					const nombre_completo = `${newPersonaJSON.nombre} ${newPersonaJSON.appaterno} ${newPersonaJSON.apmaterno}`;
+					if (rol === 'estudiante') {
+						ModelParticipante.create({
+							nombre_completo,
+							id_persona: newPersonaJSON.id_persona,
+							horas_total: 0,
+						});
+						return res.status(200).json(newPersona);
+					}
+					if (rol === 'docente') {
+						ModelDocente.create({
+							nombre_completo,
+							id_persona: newPersonaJSON.id_persona!,
+						});
+						return res.status(200).json(newPersona);
+					}
 				});
-				return res.status(200).json(newPersonas); //
 			} catch (error) {
 				console.error(error);
 				return res.status(500).json({ message: error });

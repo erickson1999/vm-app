@@ -1,78 +1,63 @@
-import { useContext, useEffect, useState } from 'react';
-import { AiOutlineDelete, AiOutlineEdit } from 'react-icons/ai';
-import { Button, ModalForRemove, SubTitle } from '../../components';
-import { Table } from '../../components/Table';
-import { UserI } from '../../components/Table/TableInterface';
-import { ContextUI } from '../../context/ContextUI';
-import { LayoutGeneral } from '../../layouts';
+import { useEffect, useState } from 'react';
 
 import axios from "axios"
+
+import { FormGrupos, Table } from '../../components';
+import { LayoutGeneral } from '../../layouts';
 import { ModelGrupoT } from '../../models';
-import { PageGruposForm } from '../../components/Pages/PageGrupos';
+import { TableGridColumnsI } from '../../components/Table/TableInterfaces';
 
+const columns: TableGridColumnsI[] = [{ name: "nombre", label: "Nombre Grupo", options: { filter: true, sort: true } },
+{ name: "estado", label: "Estado grupo", options: { filter: true, sort: true } },
+{ name: "alias", label: "Alias grupo", options: { filter: true, sort: true } }]
 
-const heads = ['id', 'Nombre', 'estado', "grupo"];
-
-export interface CicloI {
-	id_grupo: string;
-	nombre: string;
-	estado: string;
-	alias: string
-}
-
-
-
-const PageGrupos = () => {
+const Pagegrupos = () => {
 	const [grupos, setGrupos] = useState<ModelGrupoT[]>()
-	const {
-		modal: { setIsOpenModal, setContentModal },
-	} = useContext(ContextUI);
-
 	useEffect(() => {
-		axios.get(`api/v1/grupos`).then((res) => {
+		axios.get(`//api/v1/grupos`).then((res) => {
 			setGrupos(res.data)
-		}).catch((err) => { console.log({ err }) })
+		}).catch((err) => { })
 	}, []
 	)
-	const removeItem = (idItem: number) => {
+
+	const removeItem = (item: ModelGrupoT, setIsOpenModal: React.Dispatch<React.SetStateAction<boolean>>) => {
+		const idItem = item.id_grupo
 		if (!grupos) return
 		const newgrupos = grupos.filter((grupo) => {
 			return grupo.id_grupo !== idItem
 		})
-		axios.delete(`api/v1/grupos/${idItem}`)
+		axios.delete(`/api/v1/grupos/${idItem}`)
 			.then((res) => {
-				setIsOpenModal(false)
 				setGrupos(newgrupos)
+				setIsOpenModal(false)
 			})
 			.catch((err) => { console.log({ err }) })
 
 	}
-	const updateItem = (item: ModelGrupoT) => {
-		console.log({ item })
+	const updateItem = (item: ModelGrupoT, setIsOpenModal: React.Dispatch<React.SetStateAction<boolean>>) => {
 		if (!grupos) return
 		const newgrupos = grupos.map((grupo) => {
 			if (grupo.id_grupo !== item.id_grupo) {
 				return grupo
 			}
 			return item
-
 		})
-		axios.put(`api/v1/grupos/${item.id_grupo}`, item)
+		axios.put(`/api/v1/grupos/${item.id_grupo}`, item)
 			.then((res) => {
-				setIsOpenModal(false)
 				setGrupos(newgrupos)
+				setIsOpenModal(false)
 			})
 			.catch((err) => {
 				console.log(err)
 			})
 	}
-
-	const createItem = (item: ModelGrupoT) => {
+	const createItem = (item: ModelGrupoT, setIsOpenModal: React.Dispatch<React.SetStateAction<boolean>>) => {
 		if (!grupos) return
-		axios.post(`api/v1/grupos`, item)
+		axios.post(`/api/v1/grupos`, item)
 			.then((res) => {
-				setIsOpenModal(false)
+				console.log({ res })
 				setGrupos([res.data, ...grupos])
+				setIsOpenModal(false)
 			})
 			.catch((err) => {
 				console.log(err)
@@ -85,58 +70,17 @@ const PageGrupos = () => {
 			mainHeight="h-screen"
 		>
 			{grupos ? <div className="h-10/12">
-				<div className="flex flex-col items-center justify-center h-full">
-					<Button
-						background={'bg-primary'}
-						text={'Nuevo ciclo +'}
-						padding={'px-4 py-2'}
-						rounded={'rounded-full'}
-						colorText={'text-white'}
-						className={
-							'font-bold my-1 border hover:border-primary hover:bg-white transition-all hover:text-primary ease-in'
-						}
-						onClick={() => {
-							setContentModal(<PageGruposForm createItem={createItem} />);
-							setIsOpenModal(true);
-						}}
-					></Button>
+				<div className="flex flex-col items-center justify-start h-full">
 					<Table
 						data={grupos}
-						heads={heads}
-						configs={{ numeration: true, align: 'text-center' }}
-						options={{
-							enabled: true,
-							actions: (item: ModelGrupoT) => {
-								return (
-									<>
-										<AiOutlineEdit
-											className="text-orange-500 cursor-pointer"
-											onClick={() => {
-												setContentModal(
-													<PageGruposForm itemData={item} updateItem={updateItem} />
-												);
-												setIsOpenModal(true);
-											}}
-										></AiOutlineEdit>
-										<AiOutlineDelete
-											className="text-red-500 cursor-pointer"
-											onClick={() => {
-												setContentModal(
-													<ModalForRemove deleteItem={() => { removeItem(item.id_grupo!) }} >
-														<SubTitle className='font-semibold text-black'>{`Eliminar a: este item`}</SubTitle>
-													</ModalForRemove>
-												);
-												setIsOpenModal(true);
-											}}
-										></AiOutlineDelete>
-									</>
-								);
-							},
-						}}
-					></Table>
+						columns={columns}
+						Form={FormGrupos}
+						createItem={createItem}
+						updateItem={updateItem}
+						deleteItem={removeItem}></Table>
 				</div>
 			</div> : <div className='h-10/12'>loading...</div>}
 		</LayoutGeneral>
 	);
 };
-export default PageGrupos
+export default Pagegrupos

@@ -10,4 +10,5 @@ export type ModelPersonaT = {
 	fecha_registro: Date;
 	//usuario?: string;
 	//password?: string;
+	rol?: string;
 };

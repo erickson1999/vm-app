@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize';
-
+import { types } from 'pg';
 const dbConfig = {
 	name: process.env.DB_NAME,
 	user: process.env.DB_USER,
@@ -29,9 +29,12 @@ export const sequelize = new Sequelize(
 				require: true,
 				rejectUnauthorized: false,
 			},
+			useUTC: false,
 		},
 		define: {
-			freezeTableName: true
-		}
+			freezeTableName: true,
+			timestamps: true,
+		},
+		timezone: '-05:00',
 	}
 );

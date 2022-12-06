@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react';
 
 import Link from 'next/link';
+import Image from "next/image"
 import { useRouter } from 'next/router';
 
 import { Field, Form, Formik } from 'formik';
@@ -35,7 +36,7 @@ const initialValues: FormRegisterI =
 }
 
 const validate = (values: FormRegisterI) => {
-	
+
 	const errors: any = {};
 	if (!values.usuario) {
 		errors.usuario = '*El campo email es requerido';
@@ -91,7 +92,7 @@ const PageRegister = () => {
 				{/* card register */}
 				<div className="p-10 rounded-3xl shadow-xl w-3/4  lg:w-3/5 xl:w-2/5 max-w-2xl flex flex-col items-center gap-y-6 border">
 					<figure>
-						<img src="/logo-upeu.svg" alt="logo-upeu" />
+						<Image src="/logo-upeu.svg" alt="logo-upeu" />
 					</figure>
 					<h1 className="font-black text-3xl italic">REGISTRO</h1>
 					<Formik
