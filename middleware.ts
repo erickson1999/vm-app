@@ -37,7 +37,6 @@ export async function middleware(request: NextRequest) {
 			token,
 			new TextEncoder().encode(secret)
 		);
-		console.log({ payloadVerify: payload });
 		return payload as PayloadT;
 	}
 	function error(message: string, status: string | number) {
@@ -52,7 +51,8 @@ export async function middleware(request: NextRequest) {
 
 	if (!method) {
 		const url = request.nextUrl.clone();
-		url.pathname = '/api/v1/error';
+		// url.pathname = '/api/v1/error';
+		url.pathname = "/api/test"
 		url.search = `?message=${errors.noMethod.message}&status=${errors.noMethod.status}`;
 		return NextResponse.rewrite(url);
 	}
@@ -62,7 +62,6 @@ export async function middleware(request: NextRequest) {
 	if (startsWith('/api/v1/auth/register')) {
 		return NextResponse.next();
 	}
-
 	// validations anythings  enviroment variables
 	try {
 		const TOKEN_SECRET = process.env.TOKEN_SECRET;
@@ -72,14 +71,20 @@ export async function middleware(request: NextRequest) {
 		const token = request.cookies.get('x-access-token');
 		if (!token) {
 			const url = error(errors.noToken.message, errors.noToken.status);
-			return NextResponse.rewrite(url);
+			// const url = request.nextUrl.clone();
+			// url.pathname = '/login';
+			// console.log("🚀 ~ file: middleware.ts:77 ~ middleware ~ url", url)
+			
+			return NextResponse.redirect(url);
 		}
 		await verify(token, process.env.TOKEN_SECRET!);
 	} catch (error) {
 		console.error(error);
 		const url = request.nextUrl.clone();
+		// url.pathname = '/login';
 		url.pathname = '/api/v1/error';
 		url.search = `?message=${errors.forbidden.message}&${errors.forbidden.status}`;
+		// return NextResponse.redirect(url);
 		return NextResponse.rewrite(url);
 	}
 }

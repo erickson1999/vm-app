@@ -41,7 +41,7 @@ export const FormPlanParticipantes: FC<FormsI> = ({ item, createItem, updateItem
                             value={formik.values.id_persona}
                         >
                             {participantes && participantes.map((participante) => {
-                                return <MenuItem value={participante.id_persona}>{participante.codigo}</MenuItem>
+                                return <MenuItem key={participante.id_persona} value={participante.id_persona}>{participante.codigo}</MenuItem>
                             })}
                         </Select>
                     </FormControl>

@@ -35,7 +35,16 @@ ModelPersona.init(
 		//usuario: { type: DataTypes.CHAR(200) },
 		//password: { type: DataTypes.CHAR(200) },
 	},
-	{ sequelize, modelName: 'persona', timestamps: false }
+	{
+		sequelize,
+		modelName: 'persona',
+		timestamps: false,
+		hooks: {
+			beforeCreate: (persona, opciones) => {
+				console.log(persona)
+			},
+		},
+	}
 );
 
 // ModelPersona.hasMany(ModelPersona,{

@@ -69,21 +69,6 @@ export const controllerAuthRegister = async (
 					password: hash,
 				})
 					.then(() => {
-						// const token = jwt.sign(
-						// 	{ id: newPersonJSON.id_persona },
-						// 	jwtConfig.secret,
-						// 	{
-						// 		expiresIn: jwtConfig.expiresIn,
-						// 	}
-						// );
-						// const serialized = serialize('x-access-token', token, {
-						// 	httpOnly: true,
-						// 	secure: process.env.NODE_ENV === 'production',
-						// 	sameSite: 'lax',
-						// 	maxAge: 86400,
-						// 	path: '/',
-						// });
-						// res.setHeader('Set-Cookie', serialized);
 						return res.json({
 							ok: true,
 							message: messages.successRegister,

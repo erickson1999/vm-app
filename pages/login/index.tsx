@@ -42,41 +42,37 @@ const PageLogin = () => {
 	})
 
 	return (
-		<LayoutGeneral
-			mainHeight="h-screen"
-			footerHeight="h-1/12"
-			navbarHeight="h-1/12"
-		>
-			<form onSubmit={formik.handleSubmit} className="h-10/12 flex justify-center items-center">
-				<Box className='border shadow-md w-96 h-96 p-7 flex flex-col justify-around'>
-					<Image src={"/logo-upeu.svg"} alt="Picture of the author"
-						width={500}
-						height={500}>
-					</Image>
-					<Box className='flex flex-col gap-y-2'>
-						<TextField
-							className='w-full'
-							label="Usuario"
-							id="usuario"
-							name="usuario"
-							type="text"
-							onChange={formik.handleChange}
-							value={formik.values.usuario}
-						/>
-						<TextField
-							className='w-full'
-							id="outlined-uncontrolled"
-							label="Contraseña"
-							type="password"
-							name="password"
-							onChange={formik.handleChange}
-							value={formik.values.password}
-						/>
-					</Box>
-					<Button variant='outlined' type='submit'>Ingresar</Button>
+
+		<form onSubmit={formik.handleSubmit} className="h-10/12 flex justify-center items-center mt-4">
+			<Box className='border shadow-md w-96 h-96 p-7 flex flex-col justify-around'>
+				<Image src={"/logo-upeu.svg"} alt="Picture of the author"
+					width={500}
+					height={500}>
+				</Image>
+				<Box className='flex flex-col gap-y-2'>
+					<TextField
+						className='w-full'
+						label="Usuario"
+						id="usuario"
+						name="usuario"
+						type="text"
+						onChange={formik.handleChange}
+						value={formik.values.usuario}
+					/>
+					<TextField
+						className='w-full'
+						id="outlined-uncontrolled"
+						label="Contraseña"
+						type="password"
+						name="password"
+						onChange={formik.handleChange}
+						value={formik.values.password}
+					/>
 				</Box>
-			</form>
-		</LayoutGeneral>
+				<Button variant='outlined' type='submit'>Ingresar</Button>
+			</Box>
+		</form>
+
 	);
 };
 

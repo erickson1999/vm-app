@@ -1,5 +1,4 @@
 import { ReactNode, FC, useReducer } from 'react'
-
 import { ContextAuth } from "./";
 import { ContextAuthReducer } from './ContextAuthReducer';
 
@@ -44,6 +43,7 @@ export const ContextAuthProvider: FC<ContextAuthProviderI> = ({ children }) => {
         }
     }
     const getDataAuth = () => { }
+
     return (
         <ContextAuth.Provider value={{
             ...state,
